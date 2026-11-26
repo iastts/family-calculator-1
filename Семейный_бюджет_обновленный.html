@@ -1,0 +1,1739 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Семейный бюджет</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f6fa;
+    color: #263238;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1150px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #263c50;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.section {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+}
+
+.section h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
+    color: #263c50;
+}
+
+.month-select {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.month-select input {
+    max-width: 220px;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+}
+
+.card h3 {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+.card p {
+    font-size: 25px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.income-color { color: #16a36a; }
+.expense-color { color: #e05252; }
+.balance-color { color: #3279c7; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dce1e7;
+    border-radius: 7px;
+    font-size: 15px;
+    background: white;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3279c7;
+}
+
+button {
+    border: none;
+    padding: 11px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: .2s;
+}
+
+button:hover {
+    opacity: .85;
+}
+
+.add-btn {
+    background: #3279c7;
+    color: white;
+    margin-top: 17px;
+}
+
+.period-btn {
+    background: #e8eef6;
+    color: #263c50;
+    margin-top: 17px;
+}
+
+.period-btn.active {
+    background: #263c50;
+    color: white;
+}
+
+.delete-btn {
+    background: #ffe5e5;
+    color: #d33;
+}
+
+.complete-btn {
+    background: #e0f5e9;
+    color: #16804d;
+}
+
+.cancel-btn {
+    background: #fff0d9;
+    color: #996000;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 18px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th, td {
+    padding: 13px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+th {
+    background: #f8f9fb;
+    color: #777;
+}
+
+.empty {
+    text-align: center;
+    color: #999;
+    padding: 25px;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.purchase-status {
+    color: #16804d;
+    font-weight: bold;
+}
+
+.planned-total {
+    font-size: 27px;
+    font-weight: bold;
+    color: #3279c7;
+}
+
+.hint {
+    color: #777;
+    font-size: 13px;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+/* НАКОПЛЕНИЯ */
+
+.goals-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.goal-summary-card {
+    background: #f5f8fc;
+    padding: 16px;
+    border-radius: 10px;
+}
+
+.goal-summary-card p {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 8px;
+    overflow-wrap: anywhere;
+}
+
+.goal-card {
+    border: 1px solid #e5eaf0;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 15px;
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.goal-header h3 {
+    font-size: 17px;
+}
+
+.goal-progress {
+    height: 12px;
+    background: #e9edf2;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.goal-progress-fill {
+    height: 100%;
+    background: #16a36a;
+    border-radius: 20px;
+    transition: width .3s;
+}
+
+.goal-numbers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.goal-number {
+    background: #f7f9fb;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.goal-number small {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    margin-bottom: 7px;
+}
+
+.goal-number strong {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.goal-add-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.goal-add-row input {
+    max-width: 200px;
+}
+
+.goal-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.goal-complete {
+    color: #16804d;
+    background: #e0f5e9;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+@media(max-width:700px) {
+    body { padding: 12px; }
+
+    .summary, .goals-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .goal-numbers {
+        grid-template-columns: 1fr;
+    }
+
+    .goal-add-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .goal-add-row input {
+        max-width: none;
+    }
+
+    .section {
+        padding: 16px;
+    }
+
+    h1 { font-size: 25px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🏡 Семейный бюджет</h1>
+<p class="subtitle">
+Планируйте доходы, расходы, покупки и накопления
+</p>
+
+<!-- ВЫБОР МЕСЯЦА -->
+
+<div class="section">
+
+    <h2>📅 Выберите месяц бюджета</h2>
+
+    <div class="month-select">
+
+        <input type="month" id="selectedMonth">
+
+        <button class="add-btn" style="margin-top:0"
+                onclick="selectCurrentMonth()">
+            Текущий месяц
+        </button>
+
+        <button class="period-btn" id="allPeriodButton"
+                style="margin-top:0" onclick="selectAllMonths()">
+            Весь период
+        </button>
+
+    </div>
+
+    <p class="hint">
+        Можно посмотреть бюджет за выбранный месяц или общий итог
+        по всем месяцам. В режиме «Весь период» суммируются все доходы и расходы.
+    </p>
+
+</div>
+
+<!-- ОБЩИЙ БЮДЖЕТ -->
+
+<div class="summary">
+
+    <div class="card">
+        <h3>💚 Доходы за период</h3>
+        <p class="income-color" id="totalIncome">0 ₽</p>
+    </div>
+
+    <div class="card">
+        <h3>❤️ Расходы за период</h3>
+        <p class="expense-color" id="totalExpense">0 ₽</p>
+    </div>
+
+    <div class="card">
+        <h3>💙 Остаток за период</h3>
+        <p class="balance-color" id="balance">0 ₽</p>
+    </div>
+
+</div>
+
+<!-- ДОХОДЫ И РАСХОДЫ -->
+
+<div class="section">
+
+    <h2>➕ Добавить доход или расход</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label for="type">Тип операции</label>
+            <select id="type">
+                <option value="income">Доход</option>
+                <option value="expense">Расход</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Сумма (руб.)</label>
+            <input type="number" id="amount"
+                   min="0.01" step="0.01"
+                   placeholder="Например, 50000">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Категория</label>
+            <select id="category">
+                <option>Зарплата</option>
+                <option>Премия</option>
+                <option>Подработка</option>
+                <option>Пенсия</option>
+                <option>Социальные выплаты</option>
+                <option>Продукты</option>
+                <option>Жильё</option>
+                <option>Коммунальные услуги</option>
+                <option>Транспорт</option>
+                <option>Здоровье</option>
+                <option>Развлечения</option>
+                <option>Одежда</option>
+                <option>Дети</option>
+                <option>Кредиты</option>
+                <option>Связь и интернет</option>
+                <option>Дом и быт</option>
+                <option>Покупки</option>
+                <option>Другое</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <input type="text" id="description"
+                   placeholder="Например, продукты">
+        </div>
+
+        <div class="form-group">
+            <label for="date">Дата операции</label>
+            <input type="date" id="date">
+        </div>
+
+    </div>
+
+    <button class="add-btn" onclick="addTransaction()">
+        Добавить операцию
+    </button>
+
+</div>
+
+<!-- ИСТОРИЯ ОПЕРАЦИЙ -->
+
+<div class="section">
+
+    <h2>📊 История операций</h2>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Тип</th>
+                    <th>Категория</th>
+                    <th>Описание</th>
+                    <th>Сумма</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+
+            <tbody id="transactionsList"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- БУДУЩИЕ ПОКУПКИ -->
+
+<div class="section">
+
+    <h2>🛒 Будущие покупки</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label for="purchaseName">Название покупки</label>
+            <input type="text" id="purchaseName"
+                   placeholder="Например, холодильник">
+        </div>
+
+        <div class="form-group">
+            <label for="purchasePrice">Стоимость (руб.)</label>
+            <input type="number" id="purchasePrice"
+                   min="0.01" step="0.01"
+                   placeholder="Например, 65000">
+        </div>
+
+        <div class="form-group">
+            <label for="purchaseDate">Планируемая дата</label>
+            <input type="date" id="purchaseDate">
+        </div>
+
+        <div class="form-group">
+            <label for="purchaseNote">Примечание</label>
+            <input type="text" id="purchaseNote"
+                   placeholder="Например, накопить деньги">
+        </div>
+
+    </div>
+
+    <button class="add-btn" onclick="addPurchase()">
+        Добавить будущую покупку
+    </button>
+
+    <div class="table-wrapper">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Покупка</th>
+                    <th>Стоимость</th>
+                    <th>Дата</th>
+                    <th>Примечание</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+
+            <tbody id="purchasesList"></tbody>
+        </table>
+
+    </div>
+
+    <h3 style="margin-top:25px; margin-bottom:10px;">
+        💰 Сумма будущих покупок
+    </h3>
+
+    <p class="planned-total" id="plannedTotal">0 ₽</p>
+
+    <p class="hint">
+        Учитываются только покупки, которые ещё не выполнены.
+    </p>
+
+</div>
+
+<!-- НАКОПЛЕНИЯ НА ЦЕЛИ -->
+
+<div class="section">
+
+    <h2>🎯 Накопления на финансовые цели</h2>
+
+    <p class="hint" style="margin-bottom:20px;">
+        Создавайте цели, устанавливайте необходимую сумму,
+        пополняйте накопления и следите за прогрессом.
+    </p>
+
+    <!-- ОБЩАЯ СТАТИСТИКА ЦЕЛЕЙ -->
+
+    <div class="goals-summary">
+
+        <div class="goal-summary-card">
+            <span>🎯 Всего целей</span>
+            <p id="goalsCount">0</p>
+        </div>
+
+        <div class="goal-summary-card">
+            <span>💚 Уже накоплено</span>
+            <p id="goalsSaved">0 ₽</p>
+        </div>
+
+        <div class="goal-summary-card">
+            <span>💙 Осталось накопить</span>
+            <p id="goalsRemaining">0 ₽</p>
+        </div>
+
+    </div>
+
+    <!-- ФОРМА СОЗДАНИЯ ЦЕЛИ -->
+
+    <h3 style="margin-bottom:15px;">
+        ➕ Создать новую цель
+    </h3>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label for="goalCategory">Категория цели</label>
+
+            <select id="goalCategory">
+                <option value="Отпуск">✈️ Отпуск</option>
+                <option value="Ремонт">🏠 Ремонт</option>
+                <option value="Автомобиль">🚗 Автомобиль</option>
+                <option value="Крупные покупки">🛍 Крупные покупки</option>
+                <option value="Обучение">🎓 Обучение</option>
+                <option value="Финансовая подушка безопасности">
+                    🛡 Финансовая подушка безопасности
+                </option>
+                <option value="Другая цель">⭐ Другая цель</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="goalName">Название цели</label>
+
+            <input type="text" id="goalName"
+                   placeholder="Например, отпуск в Турции"
+                   maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="goalTarget">Необходимая сумма (руб.)</label>
+
+            <input type="number" id="goalTarget"
+                   min="0.01" step="0.01"
+                   placeholder="Например, 200000">
+        </div>
+
+        <div class="form-group">
+            <label for="goalSaved">Уже накоплено (руб.)</label>
+
+            <input type="number" id="goalSaved"
+                   min="0" step="0.01"
+                   value="0"
+                   placeholder="Например, 50000">
+        </div>
+
+        <div class="form-group">
+            <label for="goalCreatedAt">Дата создания цели</label>
+            <input type="date" id="goalCreatedAt">
+        </div>
+
+        <div class="form-group">
+            <label for="goalDeadline">Планируемая дата окончания</label>
+            <input type="date" id="goalDeadline">
+        </div>
+
+    </div>
+
+    <p class="hint">
+        Начальная сумма — это уже имеющиеся накопления.
+        Она не будет повторно списываться из текущего бюджета.
+    </p>
+
+    <button class="add-btn" onclick="addGoal()">
+        Создать финансовую цель
+    </button>
+
+    <!-- СПИСОК ЦЕЛЕЙ -->
+
+    <div style="margin-top:25px;">
+        <h3>📋 Мои финансовые цели</h3>
+        <div id="goalsList"></div>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =====================================
+   1. ЗАГРУЗКА И СОХРАНЕНИЕ ДАННЫХ
+===================================== */
+
+let transactions = JSON.parse(
+    localStorage.getItem("familyTransactions") || "[]"
+);
+
+let purchases = JSON.parse(
+    localStorage.getItem("familyPurchases") || "[]"
+);
+
+let goals = JSON.parse(
+    localStorage.getItem("familyGoals") || "[]"
+);
+
+// Режим отображения бюджета: выбранный месяц или все месяцы.
+let budgetMode = "month";
+
+function saveData() {
+
+    localStorage.setItem(
+        "familyTransactions",
+        JSON.stringify(transactions)
+    );
+
+    localStorage.setItem(
+        "familyPurchases",
+        JSON.stringify(purchases)
+    );
+
+    localStorage.setItem(
+        "familyGoals",
+        JSON.stringify(goals)
+    );
+
+}
+
+/* =====================================
+   2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+===================================== */
+
+function formatMoney(amount) {
+
+    return new Intl.NumberFormat("ru-RU", {
+        style: "currency",
+        currency: "RUB",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(amount);
+
+}
+
+function escapeHTML(value) {
+
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[char]);
+
+}
+
+function getToday() {
+
+    const now = new Date();
+
+    const year = now.getFullYear();
+
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+
+}
+
+function createId() {
+
+    return Date.now().toString() +
+        Math.random().toString(36).slice(2);
+
+}
+
+function formatDate(date) {
+
+    if (!date) return "—";
+
+    const parts = date.split("-");
+
+    if (parts.length !== 3) return "—";
+
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+
+}
+
+function getSelectedMonth() {
+
+    return document.getElementById("selectedMonth").value;
+
+}
+
+/* =====================================
+   3. ВЫБОР ТЕКУЩЕГО МЕСЯЦА
+===================================== */
+
+function selectCurrentMonth() {
+
+    budgetMode = "month";
+
+    document.getElementById("selectedMonth").value =
+        getToday().slice(0, 7);
+
+    updatePeriodControls();
+    renderAll();
+
+}
+
+function selectAllMonths() {
+
+    budgetMode = "all";
+
+    updatePeriodControls();
+    renderAll();
+
+}
+
+function updatePeriodControls() {
+
+    const button = document.getElementById("allPeriodButton");
+    const monthInput = document.getElementById("selectedMonth");
+
+    button.classList.toggle("active", budgetMode === "all");
+    monthInput.disabled = budgetMode === "all";
+    monthInput.style.opacity = budgetMode === "all" ? "0.55" : "1";
+
+}
+
+/* =====================================
+   4. ДОБАВЛЕНИЕ ДОХОДОВ И РАСХОДОВ
+===================================== */
+
+function addTransaction() {
+
+    const type = document.getElementById("type").value;
+
+    const amount = Number(
+        document.getElementById("amount").value
+    );
+
+    const category = document.getElementById("category").value;
+
+    const description =
+        document.getElementById("description").value.trim();
+
+    const date = document.getElementById("date").value;
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        alert("Введите корректную сумму больше нуля!");
+        return;
+    }
+
+    if (!date) {
+        alert("Укажите дату операции!");
+        return;
+    }
+
+    transactions.push({
+
+        id: createId(),
+        type,
+        amount,
+        category,
+        description: description || category,
+        date,
+        linkedPurchaseId: null,
+        linkedGoalId: null
+
+    });
+
+    saveData();
+
+    renderAll();
+
+    document.getElementById("amount").value = "";
+    document.getElementById("description").value = "";
+
+}
+
+/* =====================================
+   5. УДАЛЕНИЕ ОПЕРАЦИИ
+===================================== */
+
+function deleteTransaction(id) {
+
+    const transaction = transactions.find(
+        item => item.id === id
+    );
+
+    if (!transaction) return;
+
+    if (!confirm("Удалить эту операцию?")) return;
+
+    // Возвращаем покупку в запланированные,
+    // если удаляем связанный с ней расход.
+
+    if (transaction.linkedPurchaseId) {
+
+        purchases = purchases.map(item => {
+
+            if (item.id === transaction.linkedPurchaseId) {
+                return { ...item, completed: false };
+            }
+
+            return item;
+
+        });
+
+    }
+
+    // Возвращаем деньги в цель,
+    // если удаляем операцию пополнения накоплений.
+
+    if (transaction.linkedGoalId) {
+
+        goals = goals.map(goal => {
+
+            if (goal.id === transaction.linkedGoalId) {
+
+                return {
+                    ...goal,
+                    saved: Math.max(
+                        0,
+                        Number(goal.saved) - Number(transaction.amount)
+                    )
+                };
+
+            }
+
+            return goal;
+
+        });
+
+    }
+
+    transactions = transactions.filter(
+        item => item.id !== id
+    );
+
+    saveData();
+
+    renderAll();
+
+}
+
+/* =====================================
+   6. РАСЧЁТ БЮДЖЕТА ЗА МЕСЯЦ
+===================================== */
+
+function calculateBudget() {
+
+    const month = getSelectedMonth();
+
+    const periodTransactions = transactions.filter(item => {
+        if (budgetMode === "all") return true;
+        return item.date && item.date.slice(0, 7) === month;
+    });
+
+    const income = periodTransactions
+        .filter(item => item.type === "income")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
+
+    const expense = periodTransactions
+        .filter(item => item.type === "expense")
+        .reduce((sum, item) => sum + Number(item.amount), 0);
+
+    const balance = income - expense;
+
+    document.getElementById("totalIncome").textContent =
+        formatMoney(income);
+
+    document.getElementById("totalExpense").textContent =
+        formatMoney(expense);
+
+    document.getElementById("balance").textContent =
+        formatMoney(balance);
+
+    document.getElementById("balance").style.color =
+        balance < 0 ? "#e05252" : "#3279c7";
+
+}
+
+/* =====================================
+   7. ИСТОРИЯ ОПЕРАЦИЙ
+===================================== */
+
+function renderTransactions() {
+
+    const list = document.getElementById("transactionsList");
+
+    const month = getSelectedMonth();
+
+    const sorted = transactions
+
+        .filter(item => {
+            if (budgetMode === "all") return true;
+            return item.date && item.date.slice(0, 7) === month;
+        })
+
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+    if (sorted.length === 0) {
+
+        list.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    За выбранный период операций пока нет.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    list.innerHTML = sorted.map(item => {
+
+        const isIncome = item.type === "income";
+
+        return `
+            <tr>
+
+                <td>${formatDate(item.date)}</td>
+
+                <td>${isIncome ? "💚 Доход" : "❤️ Расход"}</td>
+
+                <td>${escapeHTML(item.category)}</td>
+
+                <td>${escapeHTML(item.description)}</td>
+
+                <td style="
+                    color: ${isIncome ? "#16a36a" : "#e05252"};
+                    font-weight: bold;
+                ">
+                    ${isIncome ? "+" : "-"}${formatMoney(item.amount)}
+                </td>
+
+                <td>
+                    <button class="delete-btn"
+                        onclick="deleteTransaction('${item.id}')">
+                        Удалить
+                    </button>
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+}
+
+/* =====================================
+   8. ДОБАВЛЕНИЕ БУДУЩЕЙ ПОКУПКИ
+===================================== */
+
+function addPurchase() {
+
+    const name =
+        document.getElementById("purchaseName").value.trim();
+
+    const price = Number(
+        document.getElementById("purchasePrice").value
+    );
+
+    const date =
+        document.getElementById("purchaseDate").value;
+
+    const note =
+        document.getElementById("purchaseNote").value.trim();
+
+    if (!name) {
+        alert("Введите название покупки!");
+        return;
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+        alert("Введите корректную стоимость покупки!");
+        return;
+    }
+
+    if (!date) {
+        alert("Укажите планируемую дату покупки!");
+        return;
+    }
+
+    purchases.push({
+
+        id: createId(),
+        name,
+        price,
+        date,
+        note,
+        completed: false
+
+    });
+
+    saveData();
+
+    renderAll();
+
+    document.getElementById("purchaseName").value = "";
+    document.getElementById("purchasePrice").value = "";
+    document.getElementById("purchaseDate").value = "";
+    document.getElementById("purchaseNote").value = "";
+
+}
+
+/* =====================================
+   9. ВЫПОЛНЕНИЕ БУДУЩЕЙ ПОКУПКИ
+===================================== */
+
+function togglePurchase(id) {
+
+    const purchase = purchases.find(
+        item => item.id === id
+    );
+
+    if (!purchase) return;
+
+    if (!purchase.completed) {
+
+        const confirmed = confirm(
+            `Выполнить покупку "${purchase.name}"?\n\n` +
+            `${formatMoney(purchase.price)} будут списаны ` +
+            `из бюджета и добавлены в историю расходов.`
+        );
+
+        if (!confirmed) return;
+
+        transactions.push({
+
+            id: createId(),
+            type: "expense",
+            amount: Number(purchase.price),
+            category: "Покупки",
+            description: purchase.name,
+            date: getToday(),
+            linkedPurchaseId: purchase.id,
+            linkedGoalId: null
+
+        });
+
+        purchases = purchases.map(item => {
+
+            if (item.id === id) {
+                return { ...item, completed: true };
+            }
+
+            return item;
+
+        });
+
+    } else {
+
+        const confirmed = confirm(
+            `Отменить выполнение покупки "${purchase.name}"?\n\n` +
+            `Расход будет удалён, деньги вернутся в бюджет.`
+        );
+
+        if (!confirmed) return;
+
+        transactions = transactions.filter(
+            item => item.linkedPurchaseId !== purchase.id
+        );
+
+        purchases = purchases.map(item => {
+
+            if (item.id === id) {
+                return { ...item, completed: false };
+            }
+
+            return item;
+
+        });
+
+    }
+
+    saveData();
+
+    renderAll();
+
+}
+
+/* =====================================
+   10. УДАЛЕНИЕ БУДУЩЕЙ ПОКУПКИ
+===================================== */
+
+function deletePurchase(id) {
+
+    const purchase = purchases.find(
+        item => item.id === id
+    );
+
+    if (!purchase) return;
+
+    if (purchase.completed) {
+
+        alert(
+            "Сначала отмените выполнение покупки. " +
+            "После этого её можно будет удалить."
+        );
+
+        return;
+
+    }
+
+    if (!confirm("Удалить запланированную покупку?")) return;
+
+    purchases = purchases.filter(
+        item => item.id !== id
+    );
+
+    saveData();
+
+    renderAll();
+
+}
+
+/* =====================================
+   11. ОТОБРАЖЕНИЕ БУДУЩИХ ПОКУПОК
+===================================== */
+
+function renderPurchases() {
+
+    const list = document.getElementById("purchasesList");
+
+    const sorted = [...purchases].sort((a, b) =>
+        a.date.localeCompare(b.date)
+    );
+
+    if (sorted.length === 0) {
+
+        list.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    Запланированных покупок пока нет.
+                </td>
+            </tr>
+        `;
+
+    } else {
+
+        list.innerHTML = sorted.map(item => {
+
+            return `
+                <tr>
+
+                    <td class="${item.completed ? "completed" : ""}">
+                        ${escapeHTML(item.name)}
+                    </td>
+
+                    <td>${formatMoney(item.price)}</td>
+
+                    <td>${formatDate(item.date)}</td>
+
+                    <td>${escapeHTML(item.note || "—")}</td>
+
+                    <td>
+                        ${item.completed
+                            ? '<span class="purchase-status">Выполнено</span>'
+                            : 'Запланировано'}
+                    </td>
+
+                    <td>
+                        ${
+                            item.completed
+
+                            ? `<button class="cancel-btn"
+                                onclick="togglePurchase('${item.id}')">
+                                Отменить
+                               </button>`
+
+                            : `<button class="complete-btn"
+                                onclick="togglePurchase('${item.id}')">
+                                Выполнить
+                               </button>`
+                        }
+
+                        <button class="delete-btn"
+                            onclick="deletePurchase('${item.id}')">
+                            Удалить
+                        </button>
+                    </td>
+
+                </tr>
+            `;
+
+        }).join("");
+
+    }
+
+    const total = purchases
+
+        .filter(item => !item.completed)
+
+        .reduce((sum, item) => sum + Number(item.price), 0);
+
+    document.getElementById("plannedTotal").textContent =
+        formatMoney(total);
+
+}
+
+/* =====================================
+   12. СОЗДАНИЕ ФИНАНСОВОЙ ЦЕЛИ
+===================================== */
+
+function addGoal() {
+
+    const category =
+        document.getElementById("goalCategory").value;
+
+    const name =
+        document.getElementById("goalName").value.trim();
+
+    const target = Number(
+        document.getElementById("goalTarget").value
+    );
+
+    const saved = Number(
+        document.getElementById("goalSaved").value
+    );
+
+    const createdAt = document.getElementById("goalCreatedAt").value;
+    const deadline = document.getElementById("goalDeadline").value;
+
+    if (!name) {
+        alert("Введите название финансовой цели!");
+        return;
+    }
+
+    if (!Number.isFinite(target) || target <= 0) {
+        alert("Введите необходимую сумму больше нуля!");
+        return;
+    }
+
+    if (!Number.isFinite(saved) || saved < 0) {
+        alert("Введите корректную сумму накоплений!");
+        return;
+    }
+
+    if (saved > target) {
+        alert("Уже накопленная сумма не может превышать цель!");
+        return;
+    }
+
+    if (!createdAt) {
+        alert("Укажите дату создания цели!");
+        return;
+    }
+
+    if (!deadline) {
+        alert("Укажите планируемую дату окончания цели!");
+        return;
+    }
+
+    if (deadline < createdAt) {
+        alert("Дата окончания не может быть раньше даты создания цели!");
+        return;
+    }
+
+    goals.push({
+
+        id: createId(),
+        category,
+        name,
+        target,
+        saved,
+        createdAt,
+        deadline
+
+    });
+
+    saveData();
+
+    renderAll();
+
+    document.getElementById("goalName").value = "";
+    document.getElementById("goalTarget").value = "";
+    document.getElementById("goalSaved").value = "0";
+    document.getElementById("goalCreatedAt").value = getToday();
+    document.getElementById("goalDeadline").value = "";
+
+}
+
+/* =====================================
+   13. ПОПОЛНЕНИЕ ФИНАНСОВОЙ ЦЕЛИ
+===================================== */
+
+function addGoalContribution(id) {
+
+    const goal = goals.find(item => item.id === id);
+
+    if (!goal) return;
+
+    const input = document.getElementById("contribution-" + id);
+
+    const amount = Number(input.value);
+
+    const remaining = Number(goal.target) - Number(goal.saved);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+
+        alert("Введите сумму пополнения больше нуля!");
+
+        return;
+
+    }
+
+    if (amount > remaining) {
+
+        alert(
+            "Сумма пополнения превышает остаток цели.\n\n" +
+            "Осталось накопить: " + formatMoney(remaining)
+        );
+
+        return;
+
+    }
+
+    const confirmed = confirm(
+        `Пополнить цель "${goal.name}" на ${formatMoney(amount)}?\n\n` +
+        `Эта сумма будет записана как расход "Накопления" ` +
+        `в бюджете текущего месяца.`
+    );
+
+    if (!confirmed) return;
+
+    // Увеличиваем накопленную сумму.
+
+    goals = goals.map(item => {
+
+        if (item.id === id) {
+
+            return {
+                ...item,
+                saved: Number(item.saved) + amount
+            };
+
+        }
+
+        return item;
+
+    });
+
+    // Записываем пополнение в историю расходов.
+
+    transactions.push({
+
+        id: createId(),
+
+        type: "expense",
+
+        amount: amount,
+
+        category: "Накопления",
+
+        description: "Пополнение цели: " + goal.name,
+
+        date: getToday(),
+
+        linkedPurchaseId: null,
+
+        linkedGoalId: goal.id
+
+    });
+
+    saveData();
+
+    renderAll();
+
+}
+
+/* =====================================
+   14. УДАЛЕНИЕ ФИНАНСОВОЙ ЦЕЛИ
+===================================== */
+
+function deleteGoal(id) {
+
+    const goal = goals.find(item => item.id === id);
+
+    if (!goal) return;
+
+    const confirmed = confirm(
+        `Удалить финансовую цель "${goal.name}"?\n\n` +
+        `История уже выполненных пополнений останется ` +
+        `в истории расходов, но сама цель будет удалена.`
+    );
+
+    if (!confirmed) return;
+
+    goals = goals.filter(item => item.id !== id);
+
+    saveData();
+
+    renderAll();
+
+}
+
+/* =====================================
+   15. ОТОБРАЖЕНИЕ ФИНАНСОВЫХ ЦЕЛЕЙ
+===================================== */
+
+function renderGoals() {
+
+    const list = document.getElementById("goalsList");
+
+    const totalSaved = goals.reduce(
+        (sum, goal) => sum + Number(goal.saved), 0
+    );
+
+    const totalTarget = goals.reduce(
+        (sum, goal) => sum + Number(goal.target), 0
+    );
+
+    const totalRemaining = goals.reduce(
+        (sum, goal) => sum +
+            Math.max(0, Number(goal.target) - Number(goal.saved)), 0
+    );
+
+    document.getElementById("goalsCount").textContent =
+        goals.length;
+
+    document.getElementById("goalsSaved").textContent =
+        formatMoney(totalSaved);
+
+    document.getElementById("goalsRemaining").textContent =
+        formatMoney(totalRemaining);
+
+    if (goals.length === 0) {
+
+        list.innerHTML = `
+            <div class="empty">
+                У тебя пока нет финансовых целей.
+                Создай первую цель выше!
+            </div>
+        `;
+
+        return;
+
+    }
+
+    list.innerHTML = goals.map(goal => {
+
+        const target = Number(goal.target);
+
+        const saved = Number(goal.saved);
+
+        const remaining = Math.max(0, target - saved);
+
+        const percent = Math.min(
+            100,
+            Math.round(saved / target * 100)
+        );
+
+        const isCompleted = remaining <= 0;
+        const createdAt = goal.createdAt || "";
+        const deadline = goal.deadline || "";
+        const today = getToday();
+        const isOverdue = !isCompleted && deadline && deadline < today;
+        const daysLeft = deadline
+            ? Math.ceil((new Date(deadline + "T00:00:00") -
+                         new Date(today + "T00:00:00")) / 86400000)
+            : null;
+
+        let deadlineStatus = "Срок не указан";
+        if (isCompleted) {
+            deadlineStatus = "Цель достигнута";
+        } else if (isOverdue) {
+            deadlineStatus = "Срок истёк";
+        } else if (daysLeft !== null) {
+            deadlineStatus = daysLeft === 0
+                ? "Последний день"
+                : `Осталось дней: ${daysLeft}`;
+        }
+
+        return `
+
+            <div class="goal-card">
+
+                <div class="goal-header">
+
+                    <h3>${escapeHTML(goal.category)}</h3>
+
+                    ${
+                        isCompleted
+                        ? `<span class="goal-complete">Цель достигнута!</span>`
+                        : `<strong>${percent}%</strong>`
+                    }
+
+                </div>
+
+                <h3 style="font-size:16px;">
+                    ${escapeHTML(goal.name)}
+                </h3>
+
+                <p class="hint" style="margin-top:8px; margin-bottom:8px;">
+                    📅 Создана: ${createdAt ? formatDate(createdAt) : "Дата не указана"}
+                    &nbsp; | &nbsp;
+                    🏁 Окончание: ${deadline ? formatDate(deadline) : "Срок не указан"}
+                </p>
+
+                <p class="hint" style="margin-top:0; color:${isOverdue ? "#d33" : (isCompleted ? "#16804d" : "#777")}; font-weight:bold;">
+                    ${deadlineStatus}
+                </p>
+
+                <div class="goal-progress">
+
+                    <div
+                        class="goal-progress-fill"
+                        style="width:${percent}%">
+                    </div>
+
+                </div>
+
+                <div class="goal-numbers">
+
+                    <div class="goal-number">
+                        <small>Необходимая сумма</small>
+                        <strong>${formatMoney(target)}</strong>
+                    </div>
+
+                    <div class="goal-number">
+                        <small>Уже накоплено</small>
+                        <strong style="color:#16a36a;">
+                            ${formatMoney(saved)}
+                        </strong>
+                    </div>
+
+                    <div class="goal-number">
+                        <small>Осталось накопить</small>
+                        <strong style="color:#3279c7;">
+                            ${formatMoney(remaining)}
+                        </strong>
+                    </div>
+
+                </div>
+
+                ${
+                    !isCompleted
+
+                    ? `
+
+                        <div class="goal-add-row">
+
+                            <input
+                                type="number"
+                                id="contribution-${goal.id}"
+                                min="0.01"
+                                step="0.01"
+                                max="${remaining}"
+                                placeholder="Сумма пополнения">
+
+                            <button
+                                class="complete-btn"
+                                onclick="addGoalContribution('${goal.id}')">
+                                Пополнить цель
+                            </button>
+
+                        </div>
+
+                    `
+
+                    : `<p class="hint" style="color:#16804d;">
+                        Поздравляем! Ты достигла этой финансовой цели!
+                       </p>`
+
+                }
+
+                <div class="goal-actions">
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteGoal('${goal.id}')">
+                        Удалить цель
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }).join("");
+
+}
+
+/* =====================================
+   16. ОБНОВЛЕНИЕ ВСЕГО ПРИЛОЖЕНИЯ
+===================================== */
+
+function renderAll() {
+
+    calculateBudget();
+
+    renderTransactions();
+
+    renderPurchases();
+
+    renderGoals();
+
+}
+
+/* =====================================
+   17. ЗАПУСК ПРИЛОЖЕНИЯ
+===================================== */
+
+document.getElementById("date").value = getToday();
+
+document.getElementById("purchaseDate").value = getToday();
+
+document.getElementById("goalCreatedAt").value = getToday();
+
+document.getElementById("selectedMonth").value =
+    getToday().slice(0, 7);
+
+document.getElementById("selectedMonth")
+    .addEventListener("change", () => {
+        budgetMode = "month";
+        updatePeriodControls();
+        renderAll();
+    });
+
+updatePeriodControls();
+renderAll();
+
+</script>
+
+</body>
+</html>
