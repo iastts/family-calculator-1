@@ -8,6 +8,81 @@
 <meta name="description" content="Семейный бюджет: доходы, расходы, будущие покупки и накопления на цели.">
 
 <style>
+/*
+   Светлая тема — значения по умолчанию.
+   Тёмная включается классом theme-dark на body.
+*/
+
+:root {
+    --bg: #f3f6fa;
+    --text: #263238;
+    --heading: #263c50;
+    --muted: #777777;
+    --lead: #4b5b68;
+    --card: #ffffff;
+    --shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    --border: #dce1e7;
+    --input-bg: #ffffff;
+    --table-head: #f8f9fb;
+    --row-border: #eeeeee;
+    --empty: #999999;
+    --soft: #f5f8fc;
+    --softer: #f7f9fb;
+    --goal-border: #e5eaf0;
+    --progress-track: #e9edf2;
+    --income: #16a36a;
+    --expense: #e05252;
+    --accent: #3279c7;
+    --period-bg: #e8eef6;
+    --period-active-bg: #263c50;
+    --period-active-text: #ffffff;
+    --delete-bg: #ffe5e5;
+    --delete-text: #dd3333;
+    --complete-bg: #e0f5e9;
+    --complete-text: #16804d;
+    --cancel-bg: #fff0d9;
+    --cancel-text: #996000;
+    --toggle-bg: #ffffff;
+    --toggle-text: #263c50;
+    --toggle-border: #dce1e7;
+    color-scheme: light;
+}
+
+body.theme-dark {
+    --bg: #12161c;
+    --text: #e6edf3;
+    --heading: #f0f4f8;
+    --muted: #9aa6b2;
+    --lead: #b7c2cc;
+    --card: #1c232d;
+    --shadow: 0 3px 16px rgba(0, 0, 0, 0.35);
+    --border: #2d3744;
+    --input-bg: #151b23;
+    --table-head: #232b36;
+    --row-border: #2a3340;
+    --empty: #8b97a5;
+    --soft: #232b36;
+    --softer: #1a222c;
+    --goal-border: #2d3744;
+    --progress-track: #2a3340;
+    --income: #3dcc8a;
+    --expense: #ff6b6b;
+    --accent: #5aa0e6;
+    --period-bg: #2a3442;
+    --period-active-bg: #5aa0e6;
+    --period-active-text: #0e141b;
+    --delete-bg: #3a2226;
+    --delete-text: #ff8a8a;
+    --complete-bg: #1c3328;
+    --complete-text: #5ddea0;
+    --cancel-bg: #3a2e1c;
+    --cancel-text: #f0c27a;
+    --toggle-bg: #1c232d;
+    --toggle-text: #f0f4f8;
+    --toggle-border: #3a4656;
+    color-scheme: dark;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -16,9 +91,11 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: #f3f6fa;
-    color: #263238;
-    padding: 20px;
+    background: var(--bg);
+    color: var(--text);
+    /* Сверху место для кнопки темы в правом углу */
+    padding: 72px 20px 20px;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .container {
@@ -29,27 +106,54 @@ body {
 h1 {
     text-align: center;
     margin-bottom: 10px;
-    color: #263c50;
+    color: var(--heading);
 }
 
 .subtitle {
     text-align: center;
-    color: #777;
+    color: var(--muted);
     margin-bottom: 25px;
 }
 
+/* КНОПКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ */
+
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--toggle-bg);
+    color: var(--toggle-text);
+    border: 1px solid var(--toggle-border);
+    box-shadow: var(--shadow);
+    padding: 10px 14px;
+}
+
+.theme-toggle:hover {
+    opacity: 1;
+    border-color: var(--accent);
+}
+
+.theme-toggle-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
 .section {
-    background: white;
+    background: var(--card);
     padding: 22px;
     border-radius: 12px;
     margin-bottom: 22px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    box-shadow: var(--shadow);
 }
 
 .section h2 {
     font-size: 20px;
     margin-bottom: 18px;
-    color: #263c50;
+    color: var(--heading);
 }
 
 .month-select {
@@ -71,15 +175,15 @@ h1 {
 }
 
 .card {
-    background: white;
+    background: var(--card);
     padding: 22px;
     border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    box-shadow: var(--shadow);
 }
 
 .card h3 {
     font-size: 14px;
-    color: #777;
+    color: var(--muted);
     margin-bottom: 12px;
 }
 
@@ -89,9 +193,17 @@ h1 {
     overflow-wrap: anywhere;
 }
 
-.income-color { color: #16a36a; }
-.expense-color { color: #e05252; }
-.balance-color { color: #3279c7; }
+.income-color { color: var(--income); }
+.expense-color { color: var(--expense); }
+.balance-color { color: var(--accent); }
+
+.amount-strong { font-weight: bold; }
+
+.success-hint { color: var(--complete-text); }
+
+.deadline-overdue { color: var(--delete-text); font-weight: bold; }
+.deadline-done { color: var(--complete-text); font-weight: bold; }
+.deadline-neutral { color: var(--muted); font-weight: bold; }
 
 .form-grid {
     display: grid;
@@ -113,15 +225,16 @@ label {
 input, select {
     width: 100%;
     padding: 12px;
-    border: 1px solid #dce1e7;
+    border: 1px solid var(--border);
     border-radius: 7px;
     font-size: 15px;
-    background: white;
+    background: var(--input-bg);
+    color: var(--text);
 }
 
 input:focus, select:focus {
     outline: none;
-    border-color: #3279c7;
+    border-color: var(--accent);
 }
 
 button {
@@ -139,35 +252,35 @@ button:hover {
 }
 
 .add-btn {
-    background: #3279c7;
-    color: white;
+    background: var(--accent);
+    color: #ffffff;
     margin-top: 17px;
 }
 
 .period-btn {
-    background: #e8eef6;
-    color: #263c50;
+    background: var(--period-bg);
+    color: var(--heading);
     margin-top: 17px;
 }
 
 .period-btn.active {
-    background: #263c50;
-    color: white;
+    background: var(--period-active-bg);
+    color: var(--period-active-text);
 }
 
 .delete-btn {
-    background: #ffe5e5;
-    color: #d33;
+    background: var(--delete-bg);
+    color: var(--delete-text);
 }
 
 .complete-btn {
-    background: #e0f5e9;
-    color: #16804d;
+    background: var(--complete-bg);
+    color: var(--complete-text);
 }
 
 .cancel-btn {
-    background: #fff0d9;
-    color: #996000;
+    background: var(--cancel-bg);
+    color: var(--cancel-text);
 }
 
 .table-wrapper {
@@ -184,39 +297,39 @@ table {
 th, td {
     padding: 13px 10px;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--row-border);
     font-size: 14px;
 }
 
 th {
-    background: #f8f9fb;
-    color: #777;
+    background: var(--table-head);
+    color: var(--muted);
 }
 
 .empty {
     text-align: center;
-    color: #999;
+    color: var(--empty);
     padding: 25px;
 }
 
 .completed {
     text-decoration: line-through;
-    color: #999;
+    color: var(--empty);
 }
 
 .purchase-status {
-    color: #16804d;
+    color: var(--complete-text);
     font-weight: bold;
 }
 
 .planned-total {
     font-size: 27px;
     font-weight: bold;
-    color: #3279c7;
+    color: var(--accent);
 }
 
 .hint {
-    color: #777;
+    color: var(--muted);
     font-size: 13px;
     margin-top: 10px;
     line-height: 1.5;
@@ -232,7 +345,7 @@ th {
 }
 
 .goal-summary-card {
-    background: #f5f8fc;
+    background: var(--soft);
     padding: 16px;
     border-radius: 10px;
 }
@@ -245,7 +358,7 @@ th {
 }
 
 .goal-card {
-    border: 1px solid #e5eaf0;
+    border: 1px solid var(--goal-border);
     border-radius: 12px;
     padding: 18px;
     margin-top: 15px;
@@ -265,7 +378,7 @@ th {
 
 .goal-progress {
     height: 12px;
-    background: #e9edf2;
+    background: var(--progress-track);
     border-radius: 20px;
     overflow: hidden;
     margin: 12px 0;
@@ -273,7 +386,7 @@ th {
 
 .goal-progress-fill {
     height: 100%;
-    background: #16a36a;
+    background: var(--income);
     border-radius: 20px;
     transition: width .3s;
 }
@@ -286,14 +399,14 @@ th {
 }
 
 .goal-number {
-    background: #f7f9fb;
+    background: var(--softer);
     padding: 12px;
     border-radius: 8px;
 }
 
 .goal-number small {
     display: block;
-    color: #777;
+    color: var(--muted);
     font-size: 12px;
     margin-bottom: 7px;
 }
@@ -322,8 +435,8 @@ th {
 }
 
 .goal-complete {
-    color: #16804d;
-    background: #e0f5e9;
+    color: var(--complete-text);
+    background: var(--complete-bg);
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 12px;
@@ -347,7 +460,7 @@ th {
 }
 
 .eyebrow {
-    color: #3279c7;
+    color: var(--accent);
     font-size: 13px;
     font-weight: bold;
     letter-spacing: 0.06em;
@@ -366,7 +479,7 @@ th {
     max-width: 640px;
     font-size: 18px;
     line-height: 1.5;
-    color: #4b5b68;
+    color: var(--lead);
     margin-bottom: 22px;
 }
 
@@ -385,14 +498,14 @@ th {
 }
 
 .landing-cta {
-    background: #3279c7;
-    color: white;
+    background: var(--accent);
+    color: #ffffff;
 }
 
 .ghost-btn {
-    background: white;
-    color: #263c50;
-    border: 1px solid #dce1e7;
+    background: var(--card);
+    color: var(--heading);
+    border: 1px solid var(--border);
 }
 
 a.ghost-btn {
@@ -414,21 +527,21 @@ a.ghost-btn {
 
 .feature-card,
 .stat {
-    background: white;
+    background: var(--card);
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    box-shadow: var(--shadow);
 }
 
 .feature-card h2 {
     font-size: 18px;
-    color: #263c50;
+    color: var(--heading);
     margin-bottom: 8px;
 }
 
 .feature-card p,
 .stat span {
-    color: #5c6b76;
+    color: var(--lead);
     font-size: 14px;
     line-height: 1.45;
 }
@@ -437,7 +550,7 @@ a.ghost-btn {
     display: block;
     margin-top: 8px;
     font-size: 26px;
-    color: #263c50;
+    color: var(--heading);
 }
 
 .app-top {
@@ -447,7 +560,15 @@ a.ghost-btn {
 }
 
 @media(max-width:700px) {
-    body { padding: 12px; }
+    body { padding: 68px 12px 12px; }
+
+    .theme-toggle-text {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+    }
 
     .summary, .goals-summary, .feature-grid, .landing-stats {
         grid-template-columns: 1fr;
@@ -484,6 +605,19 @@ a.ghost-btn {
 </head>
 
 <body>
+
+<!-- Кнопка в правом верхнем углу: светлая или тёмная тема -->
+<button
+    type="button"
+    id="themeToggle"
+    class="theme-toggle"
+    aria-pressed="false"
+    aria-label="Включить тёмную тему"
+    title="Включить тёмную тему"
+>
+    <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+    <span class="theme-toggle-text">Тёмная</span>
+</button>
 
 <!-- ПРИВЕТСТВИЕ: коротко о сайте, отсюда открывается бюджет -->
 
@@ -1201,11 +1335,12 @@ function calculateBudget() {
     document.getElementById("totalExpense").textContent =
         formatMoney(expense);
 
-    document.getElementById("balance").textContent =
-        formatMoney(balance);
+    const balanceElement = document.getElementById("balance");
 
-    document.getElementById("balance").style.color =
-        balance < 0 ? "#e05252" : "#3279c7";
+    balanceElement.textContent = formatMoney(balance);
+
+    balanceElement.classList.toggle("expense-color", balance < 0);
+    balanceElement.classList.toggle("balance-color", balance >= 0);
 
 }
 
@@ -1257,10 +1392,7 @@ function renderTransactions() {
 
                 <td>${escapeHTML(item.description)}</td>
 
-                <td style="
-                    color: ${isIncome ? "#16a36a" : "#e05252"};
-                    font-weight: bold;
-                ">
+                <td class="${isIncome ? "income-color" : "expense-color"} amount-strong">
                     ${isIncome ? "+" : "-"}${formatMoney(item.amount)}
                 </td>
 
@@ -1828,7 +1960,7 @@ function renderGoals() {
                     🏁 Окончание: ${deadline ? formatDate(deadline) : "Срок не указан"}
                 </p>
 
-                <p class="hint" style="margin-top:0; color:${isOverdue ? "#d33" : (isCompleted ? "#16804d" : "#777")}; font-weight:bold;">
+                <p class="hint ${isOverdue ? "deadline-overdue" : (isCompleted ? "deadline-done" : "deadline-neutral")}" style="margin-top:0;">
                     ${deadlineStatus}
                 </p>
 
@@ -1850,14 +1982,14 @@ function renderGoals() {
 
                     <div class="goal-number">
                         <small>Уже накоплено</small>
-                        <strong style="color:#16a36a;">
+                        <strong class="income-color">
                             ${formatMoney(saved)}
                         </strong>
                     </div>
 
                     <div class="goal-number">
                         <small>Осталось накопить</small>
-                        <strong style="color:#3279c7;">
+                        <strong class="balance-color">
                             ${formatMoney(remaining)}
                         </strong>
                     </div>
@@ -1889,7 +2021,7 @@ function renderGoals() {
 
                     `
 
-                    : `<p class="hint" style="color:#16804d;">
+                    : `<p class="hint success-hint">
                         Поздравляем! Ты достигла этой финансовой цели!
                        </p>`
 
@@ -1968,8 +2100,70 @@ function openLanding() {
 }
 
 /* =====================================
-   18. ЗАПУСК ПРИЛОЖЕНИЯ
+   18. СВЕТЛАЯ И ТЁМНАЯ ТЕМА
 ===================================== */
+
+const THEME_KEY = "familyBudgetTheme";
+
+function applyTheme(theme) {
+
+    const isDark = theme === "dark";
+
+    document.body.classList.toggle("theme-dark", isDark);
+
+    const button = document.getElementById("themeToggle");
+    const icon = button.querySelector(".theme-toggle-icon");
+    const label = button.querySelector(".theme-toggle-text");
+    const nextLabel = isDark
+        ? "Включить светлую тему"
+        : "Включить тёмную тему";
+
+    icon.textContent = isDark ? "☀️" : "🌙";
+    label.textContent = isDark ? "Светлая" : "Тёмная";
+    button.setAttribute("aria-pressed", isDark ? "true" : "false");
+    button.setAttribute("aria-label", nextLabel);
+    button.title = nextLabel;
+
+}
+
+function toggleTheme() {
+
+    const nextTheme = document.body.classList.contains("theme-dark")
+        ? "light"
+        : "dark";
+
+    localStorage.setItem(THEME_KEY, nextTheme);
+    applyTheme(nextTheme);
+
+}
+
+function initTheme() {
+
+    const savedTheme = localStorage.getItem(THEME_KEY);
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+        applyTheme(savedTheme);
+        return;
+    }
+
+    const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+    ).matches;
+
+    applyTheme(prefersDark ? "dark" : "light");
+
+}
+
+document.getElementById("themeToggle").addEventListener(
+    "click",
+    toggleTheme
+);
+
+/* =====================================
+   19. ЗАПУСК ПРИЛОЖЕНИЯ
+===================================== */
+
+initTheme();
 
 document.getElementById("date").value = getToday();
 
